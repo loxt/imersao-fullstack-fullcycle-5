@@ -14,5 +14,12 @@ func TestCreditCardNumber(t *testing.T) {
 }
 
 func TestCreditCardExpirationMonth(t *testing.T) {
+	_, err := NewCreditCard("4193523830170205", "Emannuel Matos", 13, 2024, 123)
+	assert.Equal(t, "invalid expiration month", err.Error())
 
+	_, err = NewCreditCard("4193523830170205", "Emannuel Matos", 0, 2024, 123)
+	assert.Equal(t, "invalid expiration month", err.Error())
+
+	_, err = NewCreditCard("4193523830170205", "Emannuel Matos", 10, 2024, 123)
+	assert.Nil(t, err)
 }

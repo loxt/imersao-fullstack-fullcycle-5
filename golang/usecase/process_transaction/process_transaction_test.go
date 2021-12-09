@@ -2,7 +2,7 @@ package process_transaction
 
 import (
 	"github.com/golang/mock/gomock"
-	"github.com/loxt/imersao-fullstack-fullcycle-5/domain/entities"
+	"github.com/loxt/imersao-fullstack-fullcycle-5/domain/entity"
 	mock_repository "github.com/loxt/imersao-fullstack-fullcycle-5/domain/repository/mock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -22,7 +22,7 @@ func TestProcessTransaction_ExecuteInvalidCreditCard(t *testing.T) {
 	}
 	expectedOutput := TransactionDtoOutput{
 		ID:           "1",
-		Status:       entities.REJECTED,
+		Status:       entity.REJECTED,
 		ErrorMessage: "invalid credit card number",
 	}
 
@@ -51,7 +51,7 @@ func TestProcessTransaction_ExecuteRejectedTransaction(t *testing.T) {
 	}
 	expectedOutput := TransactionDtoOutput{
 		ID:           "1",
-		Status:       entities.REJECTED,
+		Status:       entity.REJECTED,
 		ErrorMessage: "you don't have limit for this transaction",
 	}
 
@@ -80,7 +80,7 @@ func TestProcessTransaction_ExecuteApprovedTransaction(t *testing.T) {
 	}
 	expectedOutput := TransactionDtoOutput{
 		ID:           "1",
-		Status:       entities.APPROVED,
+		Status:       entity.APPROVED,
 		ErrorMessage: "",
 	}
 

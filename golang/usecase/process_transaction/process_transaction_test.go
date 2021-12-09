@@ -4,6 +4,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/loxt/imersao-fullstack-fullcycle-5/domain/entity"
 	mock_repository "github.com/loxt/imersao-fullstack-fullcycle-5/domain/repository/mock"
+	mock_broker "github.com/loxt/imersao-fullstack-fullcycle-5/infrastructure/adapter/broker/mock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
@@ -32,7 +33,10 @@ func TestProcessTransaction_ExecuteInvalidCreditCard(t *testing.T) {
 	repositoryMock := mock_repository.NewMockTransactionRepository(ctrl)
 	repositoryMock.EXPECT().Insert(input.ID, input.AccountID, input.Amount, expectedOutput.Status, expectedOutput.ErrorMessage).Return(nil)
 
-	usecase := NewProcessTransaction(repositoryMock)
+	producerMock := mock_broker.NewMockProducerInterface(ctrl)
+	producerMock.EXPECT().Publish(expectedOutput, []byte(input.ID), "transactions_result")
+
+	usecase := NewProcessTransaction(repositoryMock, producerMock, "transactions_result")
 	output, err := usecase.Execute(input)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedOutput, output)
@@ -61,7 +65,10 @@ func TestProcessTransaction_ExecuteRejectedTransaction(t *testing.T) {
 	repositoryMock := mock_repository.NewMockTransactionRepository(ctrl)
 	repositoryMock.EXPECT().Insert(input.ID, input.AccountID, input.Amount, expectedOutput.Status, expectedOutput.ErrorMessage).Return(nil)
 
-	usecase := NewProcessTransaction(repositoryMock)
+	producerMock := mock_broker.NewMockProducerInterface(ctrl)
+	producerMock.EXPECT().Publish(expectedOutput, []byte(input.ID), "transactions_result")
+
+	usecase := NewProcessTransaction(repositoryMock, producerMock, "transactions_result")
 	output, err := usecase.Execute(input)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedOutput, output)
@@ -89,8 +96,11 @@ func TestProcessTransaction_ExecuteApprovedTransaction(t *testing.T) {
 
 	repositoryMock := mock_repository.NewMockTransactionRepository(ctrl)
 	repositoryMock.EXPECT().Insert(input.ID, input.AccountID, input.Amount, expectedOutput.Status, expectedOutput.ErrorMessage).Return(nil)
+	producerMock := mock_broker.NewMockProducerInterface(ctrl)
+	producerMock.EXPECT().Publish(expectedOutput, []byte(input.ID), "transactions_result")
 
-	usecase := NewProcessTransaction(repositoryMock)
+	usecase := NewProcessTransaction(repositoryMock, producerMock, "transactions_result")
+
 	output, err := usecase.Execute(input)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedOutput, output)

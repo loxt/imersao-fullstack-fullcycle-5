@@ -3,14 +3,17 @@ package process_transaction
 import (
 	"github.com/loxt/imersao-fullstack-fullcycle-5/domain/entity"
 	"github.com/loxt/imersao-fullstack-fullcycle-5/domain/repository"
+	"github.com/loxt/imersao-fullstack-fullcycle-5/infrastructure/adapter/broker"
 )
 
 type ProcessTransaction struct {
 	Repository repository.TransactionRepository
+	Producer   broker.ProducerInterface
+	Topic      string
 }
 
-func NewProcessTransaction(transactionRepository repository.TransactionRepository) *ProcessTransaction {
-	return &ProcessTransaction{Repository: transactionRepository}
+func NewProcessTransaction(transactionRepository repository.TransactionRepository, producerInterface broker.ProducerInterface, topic string) *ProcessTransaction {
+	return &ProcessTransaction{Repository: transactionRepository, Producer: producerInterface, Topic: topic}
 }
 
 func (p *ProcessTransaction) Execute(input TransactionDtoInput) (TransactionDtoOutput, error) {
@@ -42,6 +45,10 @@ func (p *ProcessTransaction) approveTransaction(transaction *entity.Transaction)
 		Status:       entity.APPROVED,
 		ErrorMessage: "",
 	}
+	err = p.publish(output, []byte(transaction.ID))
+	if err != nil {
+		return TransactionDtoOutput{}, err
+	}
 	return output, nil
 }
 
@@ -55,5 +62,17 @@ func (p *ProcessTransaction) rejectTransaction(transaction *entity.Transaction, 
 		Status:       entity.REJECTED,
 		ErrorMessage: invalidTransaction.Error(),
 	}
+	err = p.publish(output, []byte(transaction.ID))
+	if err != nil {
+		return TransactionDtoOutput{}, err
+	}
 	return output, nil
+}
+
+func (p ProcessTransaction) publish(output TransactionDtoOutput, key []byte) error {
+	err := p.Producer.Publish(output, key, p.Topic)
+	if err != nil {
+		return err
+	}
+	return nil
 }

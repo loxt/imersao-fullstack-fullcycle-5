@@ -85,6 +85,7 @@ func TestProcessTransaction_ExecuteApprovedTransaction(t *testing.T) {
 		CreditCardCVV:             123,
 		Amount:                    1000,
 	}
+
 	expectedOutput := TransactionDtoOutput{
 		ID:           "1",
 		Status:       entity.APPROVED,

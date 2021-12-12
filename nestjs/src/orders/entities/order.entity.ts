@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { Account } from '../../accounts/entities/account.entity';
 
 export enum OrderStatus {
   Pending = 'pending',
@@ -12,7 +20,7 @@ export enum OrderStatus {
 })
 export class Order extends Model {
   @Column({
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
     primaryKey: true,
   })
@@ -38,4 +46,14 @@ export class Order extends Model {
     allowNull: false,
   })
   status: OrderStatus;
+
+  @ForeignKey(() => Account)
+  @Column({
+    allowNull: false,
+    type: DataType.UUIDV4,
+  })
+  account_id: string;
+
+  @BelongsTo(() => Account)
+  account: Account;
 }

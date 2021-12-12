@@ -7,7 +7,7 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript';
 })
 export class Account extends Model {
   @Column({
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
     primaryKey: true,
   })

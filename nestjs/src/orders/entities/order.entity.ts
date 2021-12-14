@@ -50,7 +50,7 @@ export class Order extends Model {
   @ForeignKey(() => Account)
   @Column({
     allowNull: false,
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
   })
   account_id: string;
 

@@ -18,6 +18,8 @@ services:
     container_name: db
     build: ./.docker/mysql
     restart: always
+    ports:
+      - '3306:3306'
     tty: true
     volumes:
       - ./.docker/dbdata:/var/lib/mysql
